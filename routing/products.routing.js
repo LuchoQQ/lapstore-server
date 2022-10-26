@@ -1,52 +1,27 @@
 const express = require("express");
 const router = express.Router();
-const Laptop = require("../model/Laptop");
+const multer = require("multer");
+const {
+    createProduct,
+    getImageFromS3,
+    getProductById,
+    deleteProductById,
+    getAllProducts,
+} = require("../controllers/products.controllers");
+const upload = multer({ dest: "uploads/" });
 
-router.get("/", async (req, res) => {
-    try {
-        const laptops = await Laptop.find();
-        res.json(laptops);
-        console.log(laptops)
-    } catch (error) {
-    console.log(error);
-    }
-});
+router.get("/", getAllProducts);
 
+// get image from s3
+router.get("/image/:key", getImageFromS3);
 
+// create product
+router.post("/", upload.single("image"), createProduct);
 
+// get product document by id
+router.get("/:id", getProductById);
 
-router.post("/", async (req, res) => {
-    const {name, image, price, trademark, cpu_fabricant, processor, storage, memory, memory_description, screen, quantity } = req.body;
-
-    const laptop = new Laptop({ name, image, price, trademark, cpu_fabricant, processor, storage, memory, memory_description, screen, quantity });
-    
-    try {
-        await laptop.save();
-        res.json(laptop);
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-    
-});
-
-router.get("/:id", async (req, res) => {
-    try {
-        const laptop = await Laptop.findById(req.params.id);
-        res.json(laptop);
-    } catch (error) {
-        console.log(error);
-    }
-});
-
-router.delete("/:id", async (req, res) => {
-    try {
-        await Laptop.findByIdAndDelete(req.params.id);
-        res.json({ message: "Product deleted" });
-    } catch (error) {
-        console.log(error);
-    }
-});
-
+// delete product document by id
+router.delete("/:id", deleteProductById);
 
 module.exports = router;
