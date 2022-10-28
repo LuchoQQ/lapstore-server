@@ -1,9 +1,9 @@
 const AWS = require('aws-sdk');
 const fs = require('fs')
 const s3 = new AWS.S3({
-    region: 'sa-east-1',
-    accessKeyId: 'AKIAR47PTWJ7KGQAAJ7P',
-    secretAccessKey: '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'
+    region: process.env.AWS_BUCKET_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
 const uploadFile = (file) => {
@@ -24,7 +24,7 @@ const uploadFile = (file) => {
 
 
 // download file from s3
-function downloadFile(fileKey) {
+/* function downloadFile(fileKey) {
     const downloadParams = {
       Key: fileKey,
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -32,6 +32,21 @@ function downloadFile(fileKey) {
   
     return s3.getObject(downloadParams).createReadStream();
   }
+ */
+
+  async function downloadFile(fileKey) {
+    const downloadParams = {
+        Key: fileKey,
+        Bucket: "luchoqq-lapstore",
+    };
+
+    return s3.getObject(downloadParams, (err, data) => {
+        if (err) console.error(err)
+        console.log(data)
+        //return data.createReadStream()
+    })
+}
+
 
 // delete file from s3
 function deleteFile(fileKey) {

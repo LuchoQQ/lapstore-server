@@ -5,12 +5,32 @@ const unlinkFile = util.promisify(fs.unlink);
 const Laptop = require("../model/Laptop");
 const { uploadFile, deleteFile, downloadFile } = require("../s3");
 
-const getImageFromS3 = async (req, res) => {
-    const key = req.params.key;
-    const readStream = downloadFile(key);
-    readStream.pipe(res);
-};
+// function to get image by key from s3
+    const getImageFromS3 = async (req, res) => {
+        /* const key = req.params.key;
+        const readStream = await downloadFile(key);
+        readStream.pipe(res); */
+        const key = req.params.key;
+        const readStream = await downloadFile(key)
+        //readStream.pipe(res);
+    };
+    
+    
 
+
+
+
+
+/* const getImageFromS3 = async (req, res) => {
+    try {
+        const key = req.params.key;
+        const readStream = downloadFile(key);
+        readStream.pipe(res);
+    } catch (error) {
+        console.log(error);
+    }
+};
+ */
 const createProduct = async (req, res) => {
     // upload image to s3 and get the url of the image and save it to the database
     const file = req.file;
@@ -40,7 +60,7 @@ const createProduct = async (req, res) => {
     } catch (error) {
         deleteFile(imageUploaded.Key);
         await unlinkFile(`./uploads/${imageUploaded.Key}`);
-        console.log(error)
+        console.log(error);
         return res.status(505).json({ message: error.message });
     }
 };
@@ -52,7 +72,7 @@ const getProductById = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const deleteProductById = async (req, res) => {
     try {
@@ -61,7 +81,7 @@ const deleteProductById = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const getAllProducts = async (req, res) => {
     try {
@@ -70,7 +90,12 @@ const getAllProducts = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
-
-module.exports = { createProduct, getImageFromS3, getProductById, deleteProductById, getAllProducts };
+module.exports = {
+    createProduct,
+    getImageFromS3,
+    getProductById,
+    deleteProductById,
+    getAllProducts,
+};
