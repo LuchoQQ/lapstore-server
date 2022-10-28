@@ -12,7 +12,7 @@ const uploadFile = (file) => {
 
     // Setting up S3 upload parameters
     const params = {
-        Bucket: "luchoqq-lapstore",
+        Bucket: process.env.AWS_BUCKET_NAME,
         Body: fileStream,
         Key: file.filename, // File name you want to save as in S3
     };
@@ -37,7 +37,7 @@ const uploadFile = (file) => {
   async function downloadFile(fileKey) {
     const downloadParams = {
         Key: fileKey,
-        Bucket: "luchoqq-lapstore",
+        Bucket: process.env.AWS_BUCKET_NAME,
     };
 
     return s3.getObject(downloadParams, (err, data) => {
