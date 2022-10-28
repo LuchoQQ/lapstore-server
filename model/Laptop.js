@@ -5,6 +5,7 @@ const laptopSchema = new mongoose.Schema({
   image: { type: String, required: true },
   price: { type: Number, required: true },
   trademark: { type: String, required: true },
+  graphics: { type: String, required: true },
   cpu_fabricant: { type: String, required: true },
   processor: { type: String, required: true },
   storage: {

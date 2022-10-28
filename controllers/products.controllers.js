@@ -23,6 +23,7 @@ const createProduct = async (req, res) => {
             name: req.body.name,
             image: imageUploaded.Key,
             price: req.body.price,
+            graphics: req.body.graphics,
             trademark: req.body.trademark,
             cpu_fabricant: req.body.cpu_fabricant,
             processor: req.body.processor,
@@ -39,7 +40,8 @@ const createProduct = async (req, res) => {
     } catch (error) {
         deleteFile(imageUploaded.Key);
         await unlinkFile(`./uploads/${imageUploaded.Key}`);
-        return res.status(500).json({ message: error.message });
+        console.log(error)
+        return res.status(505).json({ message: error.message });
     }
 };
 
@@ -65,7 +67,6 @@ const getAllProducts = async (req, res) => {
     try {
         const laptops = await Laptop.find();
         res.json(laptops);
-        console.log(laptops);
     } catch (error) {
         console.log(error);
     }
