@@ -1,42 +1,31 @@
 const fs = require("fs");
 const util = require("util");
+const AWS = require("aws-sdk");
+
 const unlinkFile = util.promisify(fs.unlink);
 
 const Laptop = require("../model/Laptop");
-const { uploadFile, deleteFile, downloadFile } = require("../s3");
-
-// function to get image by key from s3
-    const getImageFromS3 = async (req, res) => {
-        /* const key = req.params.key;
-        const readStream = await downloadFile(key);
-        readStream.pipe(res); */
-        const key = req.params.key;
-        const readStream = await downloadFile(key)
-        //readStream.pipe(res);
-    };
-    
-    
+const { uploadFile, deleteFile, downloadFile, listFiles } = require("../s3");
 
 
-
-
-
-/* const getImageFromS3 = async (req, res) => {
+// get image if it exists in s3 and download
+const getImageFromS3 = async (req, res) => {
+    const key = req.params.key;
     try {
-        const key = req.params.key;
-        const readStream = downloadFile(key);
+        const file = await downloadFile(key);
+        const readStream = file.createReadStream();
         readStream.pipe(res);
     } catch (error) {
-        console.log(error);
+        return res.status(400).json({ message: error.message });
     }
 };
- */
+
+
+// create product and upload image to s3
 const createProduct = async (req, res) => {
-    // upload image to s3 and get the url of the image and save it to the database
     const file = req.file;
     if (!file) return res.status(400).json({ message: "Please upload a file" });
 
-    // create product
     const imageUploaded = await uploadFile(file);
     try {
         const laptop = await new Laptop({
@@ -65,6 +54,8 @@ const createProduct = async (req, res) => {
     }
 };
 
+
+// get product by id from MongoDB
 const getProductById = async (req, res) => {
     try {
         const laptop = await Laptop.findById(req.params.id);
@@ -74,15 +65,20 @@ const getProductById = async (req, res) => {
     }
 };
 
+// delete product for MongoDB and s3
 const deleteProductById = async (req, res) => {
+    const { id } = req.params;
     try {
+        const laptop = await Laptop.findById(id);
+        await deleteFile(laptop.image);
         await Laptop.findByIdAndDelete(req.params.id);
-        res.json({ message: "Product deleted" });
+        return res.status(200).json({ message: "Product deleted" });
     } catch (error) {
         console.log(error);
     }
 };
 
+// get all products from MongoDB
 const getAllProducts = async (req, res) => {
     try {
         const laptops = await Laptop.find();

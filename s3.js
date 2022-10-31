@@ -2,9 +2,30 @@ const AWS = require('aws-sdk');
 const fs = require('fs')
 const s3 = new AWS.S3({
     region: process.env.AWS_BUCKET_REGION,
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
+
+
+// download file from s3
+const downloadFile = async (key) => {
+    const params = {
+        Bucket: 'luchoqq-lapstore',
+        Key: key,
+    };
+
+    return s3.getObject(params)
+};
+
+// list objects in s3
+function listObjects() {
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+    };
+
+    return s3.listObjectsV2(params).promise();
+}
+
 
 const uploadFile = (file) => {
     // Read content from the file
@@ -23,31 +44,6 @@ const uploadFile = (file) => {
 }
 
 
-// download file from s3
-/* function downloadFile(fileKey) {
-    const downloadParams = {
-      Key: fileKey,
-      Bucket: process.env.AWS_BUCKET_NAME,
-    };
-  
-    return s3.getObject(downloadParams).createReadStream();
-  }
- */
-
-  async function downloadFile(fileKey) {
-    const downloadParams = {
-        Key: fileKey,
-        Bucket: process.env.AWS_BUCKET_NAME,
-    };
-
-    return s3.getObject(downloadParams, (err, data) => {
-        if (err) console.error(err)
-        console.log(data)
-        //return data.createReadStream()
-    })
-}
-
-
 // delete file from s3
 function deleteFile(fileKey) {
     const deleteParams = {
@@ -57,4 +53,14 @@ function deleteFile(fileKey) {
     return s3.deleteObject(deleteParams).promise();
 }
 
-module.exports = { uploadFile, downloadFile, deleteFile }
+// list all files in s3
+function listFiles() {
+    const listParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+    };
+    return s3.listObjectsV2(listParams).promise();
+}
+
+
+
+module.exports = { uploadFile, deleteFile, downloadFile, listFiles };

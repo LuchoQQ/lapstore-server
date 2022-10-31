@@ -8,6 +8,7 @@ const {
     deleteProductById,
     getAllProducts,
 } = require("../controllers/products.controllers");
+const { listFiles } = require("../s3");
 const upload = multer({ dest: "uploads/" });
 
 router.get("/", getAllProducts);
@@ -23,5 +24,6 @@ router.get("/:id", getProductById);
 
 // delete product document by id
 router.delete("/:id", deleteProductById);
+
 
 module.exports = router;
