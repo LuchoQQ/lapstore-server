@@ -74,10 +74,10 @@ const validateUser = async (req, res) => {
                     token: generateToken(user._id),
                 });
             } else {
-                res.status(400).json("Wrong password");
+                return res.status(401).json("Wrong password");
             }
         } else {
-            return res.status(400).json("User not found");
+            return res.status(401).json("User not found");
         }
     } catch (err) {
         return res.status(500).json(err);
@@ -86,7 +86,8 @@ const validateUser = async (req, res) => {
 
 // validate token and return user data
 const validateToken = async (req, res) => {
-    const { token } = req.body;
+    const token = req.headers.authorization
+    console.log(token)
     try {
         const decoded = verifyToken(token);
         const user = await User.findById(decoded.id);
